@@ -215,3 +215,5 @@ LinkedList<T>* LinkedList<T>::Concat(LinkedList<T>* list){
     }
     return result;  
 }
+
+template class LinkedList<int>;

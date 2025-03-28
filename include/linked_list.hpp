@@ -8,6 +8,7 @@ private:
         T data;
         Node* next;
         Node(T data) : data(data), next(nullptr) {}
+        Node(T data, Node* next) : data(data), next(next) {}
     };
 
     Node* root;
