@@ -18,4 +18,7 @@ public:
 
     void Set(int index, T value);
     void Resize(int newSize);
+
+    T& operator[](int index);
+    const T& operator[](int index) const;
 };

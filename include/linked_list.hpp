@@ -10,8 +10,8 @@ private:
         Node(T data) : data(data), next(nullptr) {}
     };
 
-    Node* head;
-    int length;
+    Node* root;
+    int size;
 
 public:
     LinkedList();
