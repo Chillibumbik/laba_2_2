@@ -22,7 +22,6 @@ public:
     virtual Sequence<T>* AppendInternal(T item) = 0;
     virtual Sequence<T>* PrependInternal(T item) = 0;
     virtual Sequence<T>* InsertAtInternal(T item, int index) = 0;
-
     virtual Sequence<T>* Instance() = 0;
     virtual Sequence<T>* Clone() const = 0;
 };

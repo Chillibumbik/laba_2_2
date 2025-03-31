@@ -8,6 +8,7 @@ private:
     int size;
 
 public:
+//    DynamicArray(); можно сделать, если сделать, чтобы вылетало уведомление о пропущенных полях
     DynamicArray(T* items, int count);
     DynamicArray(int size);
     DynamicArray(const DynamicArray<T>& other);
@@ -18,10 +19,13 @@ public:
 
     void Set(int index, T value);
     void Resize(int newSize);
+    DynamicArray<T>* GetSubArray(int startIndex, int endIndex) const;
+
 
     T& operator[](int index);
     const T& operator[](int index) const;
 };
+
 
 template <class T>
 DynamicArray<T>::DynamicArray(T* items, int count) {
@@ -90,6 +94,22 @@ void DynamicArray<T>::Resize(int newSize) {
     data = newData;
     size = newSize;
 }
+
+template <class T>
+DynamicArray<T>* DynamicArray<T>::GetSubArray(int startIndex, int endIndex) const {
+    if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
+        throw std::out_of_range("Invalid subarray indices");
+
+    int count = endIndex - startIndex + 1;
+    T* subData = new T[count];
+
+    for (int i = 0; i < count; i++) {
+        subData[i] = data[startIndex + i];
+    }
+
+    return new DynamicArray<T>(subData, count);
+}
+
 
 template <class T>
 T& DynamicArray<T>::operator[](int index) {
