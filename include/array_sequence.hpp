@@ -11,7 +11,7 @@ class ArraySequence : public Sequence<T> {
 protected:
     DynamicArray<T>* items;
 
-    ArraySequence(DynamicArray<T>* istems) : items(items) {}
+    ArraySequence(DynamicArray<T>* istems) : items(istems) {}
 
 public:
     ArraySequence() {

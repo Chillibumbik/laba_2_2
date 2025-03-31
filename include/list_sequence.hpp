@@ -25,6 +25,10 @@ public:
         list = new LinkedList<T>(*other.list);
     }
 
+    ListSequence(const LinkedList<T>& list) {
+        this->list = new LinkedList<T>(list);
+    }
+
     ~ListSequence() override {
         delete list;
     }
@@ -57,6 +61,8 @@ public:
     ImmutableListSequence() : ListSequence<T>() {}
     ImmutableListSequence(T* items, int count) : ListSequence<T>(items, count) {}
     ImmutableListSequence(const ImmutableListSequence<T>& other) : ListSequence<T>(other) {}
+    ImmutableListSequence(const LinkedList<T>& list) : ListSequence<T>(list) {}
+
 
     Sequence<T>* Append(T item) override {
         auto copy = new LinkedList<T>(*this->list);
@@ -96,6 +102,8 @@ public:
     MutableListSequence() : ListSequence<T>() {}
     MutableListSequence(T* items, int count) : ListSequence<T>(items, count) {}
     MutableListSequence(const MutableListSequence<T>& other) : ListSequence<T>(other) {}
+    MutableListSequence(const LinkedList<T>& list) : ListSequence<T>(list) {}
+
 
     Sequence<T>* Append(T item) override {
         this->list->Append(item);
