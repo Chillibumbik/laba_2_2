@@ -2,34 +2,37 @@
 
 #include "sequence.hpp"
 #include "linked_list.hpp"
+#include <stdexcept>
 
-// Базовый класс ListSequence
+// Изменяемая версия — базовый класс
 
-template <class T>
-class ListSequence : public Sequence<T> {
+template <typename T>
+class MutableListSequence : public Sequence<T> {
 protected:
     LinkedList<T>* list;
 
-    ListSequence(LinkedList<T>* list) : list(list) {}
+    Sequence<T>* CreateFromList(LinkedList<T>* list) const {
+        return new MutableListSequence<T>(*list);
+    }
 
 public:
-    ListSequence() {
+    MutableListSequence() {
         list = new LinkedList<T>();
     }
 
-    ListSequence(T* items, int count) {
+    MutableListSequence(T* items, int count) {
         list = new LinkedList<T>(items, count);
     }
 
-    ListSequence(const ListSequence<T>& other) {
+    MutableListSequence(const MutableListSequence<T>& other) {
         list = new LinkedList<T>(*other.list);
     }
 
-    ListSequence(const LinkedList<T>& list) {
+    MutableListSequence(const LinkedList<T>& list) {
         this->list = new LinkedList<T>(list);
     }
 
-    ~ListSequence() override {
+    ~MutableListSequence() override {
         delete list;
     }
 
@@ -44,79 +47,24 @@ public:
     }
 
     Sequence<T>* Concat(Sequence<T>* other) const override {
-        auto otherList = dynamic_cast<const ListSequence<T>*>(other);
+        auto otherList = dynamic_cast<const MutableListSequence<T>*>(other);
         if (!otherList) throw std::invalid_argument("Incompatible sequence types");
         LinkedList<T>* result = list->Concat(otherList->list);
         return CreateFromList(result);
     }
 
-    virtual Sequence<T>* CreateFromList(LinkedList<T>* list) const = 0;
-};
-
-// Immutable
-
-template <class T>
-class ImmutableListSequence : public ListSequence<T> {
-public:
-    ImmutableListSequence() : ListSequence<T>() {}
-    ImmutableListSequence(T* items, int count) : ListSequence<T>(items, count) {}
-    ImmutableListSequence(const ImmutableListSequence<T>& other) : ListSequence<T>(other) {}
-    ImmutableListSequence(const LinkedList<T>& list) : ListSequence<T>(list) {}
-
-
     Sequence<T>* Append(T item) override {
-        auto copy = new LinkedList<T>(*this->list);
-        copy->Append(item);
-        return new ImmutableListSequence<T>(*copy);
-    }
-
-    Sequence<T>* Prepend(T item) override {
-        auto copy = new LinkedList<T>(*this->list);
-        copy->Prepend(item);
-        return new ImmutableListSequence<T>(*copy);
-    }
-
-    Sequence<T>* InsertAt(T item, int index) override {
-        auto copy = new LinkedList<T>(*this->list);
-        copy->InsertAt(item, index);
-        return new ImmutableListSequence<T>(*copy);
-    }
-
-    Sequence<T>* AppendInternal(T) override { throw std::logic_error("Immutable"); }
-    Sequence<T>* PrependInternal(T) override { throw std::logic_error("Immutable"); }
-    Sequence<T>* InsertAtInternal(T, int) override { throw std::logic_error("Immutable"); }
-
-    Sequence<T>* Instance() override { return Clone(); }
-    Sequence<T>* Clone() const override { return new ImmutableListSequence<T>(*this); }
-
-    Sequence<T>* CreateFromList(LinkedList<T>* list) const override {
-        return new ImmutableListSequence<T>(*list);
-    }
-};
-
-// Mutable
-
-template <class T>
-class MutableListSequence : public ListSequence<T> {
-public:
-    MutableListSequence() : ListSequence<T>() {}
-    MutableListSequence(T* items, int count) : ListSequence<T>(items, count) {}
-    MutableListSequence(const MutableListSequence<T>& other) : ListSequence<T>(other) {}
-    MutableListSequence(const LinkedList<T>& list) : ListSequence<T>(list) {}
-
-
-    Sequence<T>* Append(T item) override {
-        this->list->Append(item);
+        list->Append(item);
         return this;
     }
 
     Sequence<T>* Prepend(T item) override {
-        this->list->Prepend(item);
+        list->Prepend(item);
         return this;
     }
 
     Sequence<T>* InsertAt(T item, int index) override {
-        this->list->InsertAt(item, index);
+        list->InsertAt(item, index);
         return this;
     }
 
@@ -126,8 +74,33 @@ public:
 
     Sequence<T>* Instance() override { return this; }
     Sequence<T>* Clone() const override { return new MutableListSequence<T>(*this); }
+};
 
-    Sequence<T>* CreateFromList(LinkedList<T>* list) const override {
-        return new MutableListSequence<T>(*list);
+// Неизменяемая версия
+
+template <typename T>
+class ImmutableListSequence : public MutableListSequence<T> {
+public:
+    using MutableListSequence<T>::MutableListSequence;
+
+    Sequence<T>* Append(T item) override {
+        return this->Clone()->AppendInternal(item);
+    }
+
+    Sequence<T>* Prepend(T item) override {
+        return this->Clone()->PrependInternal(item);
+    }
+
+    Sequence<T>* InsertAt(T item, int index) override {
+        return this->Clone()->InsertAtInternal(item, index);
+    }
+
+    Sequence<T>* AppendInternal(T) override { throw std::logic_error("Immutable"); }
+    Sequence<T>* PrependInternal(T) override { throw std::logic_error("Immutable"); }
+    Sequence<T>* InsertAtInternal(T, int) override { throw std::logic_error("Immutable"); }
+
+    Sequence<T>* Instance() override { return this->Clone(); }
+    Sequence<T>* Clone() const override {
+        return new ImmutableListSequence<T>(*this);
     }
 };
