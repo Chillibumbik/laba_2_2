@@ -100,6 +100,11 @@ public:
         return this;
     }
 
+    Sequence<T>* Remove(int index) override {
+        items->Remove(index);
+        return this;
+    }
+
     Sequence<T>* AppendInternal(T item) override { return Append(item); }
     Sequence<T>* PrependInternal(T item) override { return Prepend(item); }
     Sequence<T>* InsertAtInternal(T item, int index) override { return InsertAt(item, index); }
@@ -125,6 +130,10 @@ public:
 
     Sequence<T>* InsertAt(T item, int index) override {
         return this->Clone()->InsertAtInternal(item, index);
+    }
+
+    Sequence<T>* Remove(int index) override {
+        return this->Clone()->Remove(index);
     }
 
     Sequence<T>* AppendInternal(T) override { throw std::logic_error("Immutable"); }

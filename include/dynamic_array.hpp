@@ -76,11 +76,18 @@ int DynamicArray<T>::GetSize() const {
 
 template <class T>
 void DynamicArray<T>::Remove(int index) {
-    for (long long unsigned int i=index; i<sizeof(data)-1; i++){
-        data[i] = data[i+1];
+    if (size == 0) return;
+
+    if (index < 0 || index >= size)
+        throw std::out_of_range("Index out of bounds");
+
+    for (int i = index; i < size - 1; ++i) {
+        data[i] = data[i + 1];
     }
-    size --;
+
+    Resize(size - 1);
 }
+
 
 template <class T>
 void DynamicArray<T>::Set(int index, T value) {

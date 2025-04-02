@@ -12,11 +12,12 @@ void PrintMenu() {
     cout << "1. Show sequence\n";
     cout << "2. Append element\n";
     cout << "3. Prepend element\n";
-    cout << "4. Insert element at index\n";
-    cout << "5. Get element by index\n";
-    cout << "6. Get subsequence\n";
-    cout << "7. Concat another sequence\n";
-    cout << "8. Exit\n";
+    cout << "4. Remove element\n";
+    cout << "5. Insert element at index\n";
+    cout << "6. Get element by index\n";
+    cout << "7. Get subsequence\n";
+    cout << "8. Concat another sequence\n";
+    cout << "9. Exit\n";
     cout << "Select option: ";
 }
 
@@ -81,7 +82,7 @@ int main() {
         int choice;
         cin >> choice;
 
-        if (choice == 8) break;
+        if (choice == 9) break;
 
         int index, start, end;
         BoxedAny value;
@@ -101,10 +102,20 @@ int main() {
             case 4:
                 cout << "Enter index: ";
                 cin >> index;
+                try {
+                    seq = seq->Remove(index);
+                    cout << "Element has been removed";                 
+                }catch(exception& e){
+                    cout << "Error: " << e.what() << endl;
+                }
+                break;
+            case 5:
+                cout << "Enter index: ";
+                cin >> index;
                 value = ReadBoxed();
                 seq = seq->InsertAt(value, index);
                 break;
-            case 5:
+            case 6:
                 cout << "Enter index: ";
                 cin >> index;
                 try {
@@ -113,7 +124,7 @@ int main() {
                     cout << "Error: " << e.what() << endl;
                 }
                 break;
-            case 6:
+            case 7:
                 cout << "Enter start index: ";
                 cin >> start;
                 cout << "Enter end index: ";
@@ -127,7 +138,7 @@ int main() {
                     cout << "Error: " << e.what() << endl;
                 }
                 break;
-            case 7: {
+            case 8: {
                 Sequence<BoxedAny>* other = (type == 1)
                     ? (Sequence<BoxedAny>*)new MutableArraySequence<BoxedAny>()
                     : (Sequence<BoxedAny>*)new MutableListSequence<BoxedAny>();
