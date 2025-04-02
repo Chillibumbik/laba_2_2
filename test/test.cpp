@@ -37,6 +37,9 @@ TEST_CASE("DynamicArray: Basic Operations", "[DynamicArray]") {
 
     REQUIRE_THROWS_AS(arr.Get(10), std::out_of_range);
     REQUIRE_THROWS_AS(arr.Set(5, 100), std::out_of_range);
+
+    arr.Remove(1);
+    REQUIRE(arr.GetSize() == 1);
 }
 
 TEST_CASE("LinkedList: Basic Operations", "[LinkedList]") {
@@ -103,3 +106,4 @@ TEST_CASE("ListSequence: Operations", "[ListSequence]") {
     REQUIRE(sub->Get(0) == 5);
     delete sub;
 }
+

@@ -152,3 +152,5 @@ int main() {
     cout << "Goodbye!\n";
     return 0;
 }
+
+// доавить удаление элементов

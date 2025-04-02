@@ -17,6 +17,8 @@ public:
     T Get(int index) const;
     int GetSize() const;
 
+    void Remove(int index);
+
     void Set(int index, T value);
     void Resize(int newSize);
     DynamicArray<T>* GetSubArray(int startIndex, int endIndex) const;
@@ -70,6 +72,14 @@ T DynamicArray<T>::Get(int index) const {
 template <class T>
 int DynamicArray<T>::GetSize() const {
     return size;
+}
+
+template <class T>
+void DynamicArray<T>::Remove(int index) {
+    for (long long unsigned int i=index; i<sizeof(data)-1; i++){
+        data[i] = data[i+1];
+    }
+    size --;
 }
 
 template <class T>
