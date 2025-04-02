@@ -24,34 +24,44 @@ void PrintMenu() {
 BoxedAny ReadBoxed() {
     cout << "Choose type:\n1. int\n2. double\n3. string\n> ";
     int type;
-    cin >> type;
-
-    if (type == 1) {
-        int v;
-        while (!(cin >> v)) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid int. Try again: ";
-        }
-        return BoxedAny(v);
-    } else if (type == 2) {
-        double v;
-        while (!(cin >> v)) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid double. Try again: ";
-        }
-        return BoxedAny(v);
-    } else if (type == 3) {
-        string v;
-        cin >> ws;
-        getline(cin, v);
-        return BoxedAny(v);
-    } else {
-        cout << "Unknown type. Defaulting to int 0.\n";
-        return BoxedAny(0);
+    
+    while (!(cin >> type) || (type < 1 || type > 3)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Invalid type. Choose 1, 2, or 3: ";
     }
+
+    try {
+        if (type == 1) {
+            int v;
+            while (!(cin >> v)) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid int. Try again: ";
+            }
+            return BoxedAny(v);
+        } else if (type == 2) {
+            double v;
+            while (!(cin >> v)) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid double. Try again: ";
+            }
+            return BoxedAny(v);
+        } else if (type == 3) {
+            string v;
+            cin >> ws;        
+            getline(cin, v); 
+            return BoxedAny(v);
+        }
+    } catch (exception& e) {
+        cout << "Error: " << e.what() << endl;
+        return BoxedAny();  
+    }
+
+    return BoxedAny(); 
 }
+
 
 template<typename T>
 void ShowSequence(Sequence<T>* seq) {
@@ -113,8 +123,13 @@ int main() {
                 cout << "Enter index: ";
                 cin >> index;
                 value = ReadBoxed();
-                seq = seq->InsertAt(value, index);
+                try {
+                    seq = seq->InsertAt(value, index);
+                } catch (exception& e) {
+                    cout << "Error: " << e.what() << endl;
+                }
                 break;
+            
             case 6:
                 cout << "Enter index: ";
                 cin >> index;
