@@ -32,7 +32,8 @@ BoxedAny ReadBoxed() {
     }
 
     try {
-        if (type == 1) {
+        cout << "Enter value: ";
+        if (type == 1) { // int
             int v;
             while (!(cin >> v)) {
                 cin.clear();
@@ -40,15 +41,16 @@ BoxedAny ReadBoxed() {
                 cout << "Invalid int. Try again: ";
             }
             return BoxedAny(v);
-        } else if (type == 2) {
+        } else if (type == 2) { // double
             double v;
             while (!(cin >> v)) {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Invalid double. Try again: ";
             }
+
             return BoxedAny(v);
-        } else if (type == 3) {
+        } else if (type == 3) { // string
             string v;
             cin >> ws;        
             getline(cin, v); 
@@ -77,11 +79,16 @@ void ShowSequence(Sequence<T>* seq) {
 int main() {
     cout << "Choose sequence type:\n1. Mutable ArraySequence\n2. Mutable ListSequence\n> ";
     int type;
-    cin >> type;
+
+    while (!(cin >> type) || (type < 1 || type > 2)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Invalid type. Choose 1 or 2: ";
+    }
 
     Sequence<BoxedAny>* seq = nullptr;
-    if (type == 1) seq = new MutableArraySequence<BoxedAny>();
-    else if (type == 2) seq = new MutableListSequence<BoxedAny>();
+    if (type == 1) seq = new MutableArraySequence<BoxedAny>(); // ArraySequence
+    else if (type == 2) seq = new MutableListSequence<BoxedAny>(); // ListSequence
     else {
         cout << "Invalid selection.\n";
         return 1;
@@ -90,26 +97,31 @@ int main() {
     while (true) {
         PrintMenu();
         int choice;
-        cin >> choice;
 
-        if (choice == 9) break;
+        while (!(cin >> choice) || (choice < 1 || choice > 9)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid choise. Try again: ";
+        }
+
+        if (choice == 9) break; // exit
 
         int index, start, end;
         BoxedAny value;
 
         switch (choice) {
-            case 1:
+            case 1: // Show sequence
                 ShowSequence(seq);
                 break;
-            case 2:
+            case 2: // Append element
                 value = ReadBoxed();
                 seq = seq->Append(value);
                 break;
-            case 3:
+            case 3: // Prepend element
                 value = ReadBoxed();
                 seq = seq->Prepend(value);
                 break;
-            case 4:
+            case 4: // Remove element
                 cout << "Enter index: ";
                 cin >> index;
                 try {
@@ -119,7 +131,7 @@ int main() {
                     cout << "Error: " << e.what() << endl;
                 }
                 break;
-            case 5:
+            case 5: // Insert element at index
                 cout << "Enter index: ";
                 cin >> index;
                 value = ReadBoxed();
@@ -130,7 +142,7 @@ int main() {
                 }
                 break;
             
-            case 6:
+            case 6: // Get element by index
                 cout << "Enter index: ";
                 cin >> index;
                 try {
@@ -139,7 +151,7 @@ int main() {
                     cout << "Error: " << e.what() << endl;
                 }
                 break;
-            case 7:
+            case 7: // Get subsequence
                 cout << "Enter start index: ";
                 cin >> start;
                 cout << "Enter end index: ";
@@ -153,7 +165,7 @@ int main() {
                     cout << "Error: " << e.what() << endl;
                 }
                 break;
-            case 8: {
+            case 8: { // Concat another sequence
                 Sequence<BoxedAny>* other = (type == 1)
                     ? (Sequence<BoxedAny>*)new MutableArraySequence<BoxedAny>()
                     : (Sequence<BoxedAny>*)new MutableListSequence<BoxedAny>();
@@ -179,5 +191,4 @@ int main() {
     return 0;
 }
 
-// вынести ошибки в отдельный файл
 

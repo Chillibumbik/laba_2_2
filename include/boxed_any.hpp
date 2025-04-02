@@ -36,7 +36,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const BoxedAny& obj) {
         if (obj.value.type() == typeid(int)) os << std::any_cast<int>(obj.value);
         else if (obj.value.type() == typeid(double)) os << std::any_cast<double>(obj.value);
-        else if (obj.value.type() == typeid(std::string)) os << std::any_cast<std::string>(obj.value);
+        else if (obj.value.type() == typeid(std::string)) os << "\"" << std::any_cast<std::string>(obj.value) << "\"";
         else os << "<unsupported type: " << obj.value.type().name() << ">";
         return os;
     }
