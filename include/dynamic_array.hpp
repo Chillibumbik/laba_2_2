@@ -1,5 +1,6 @@
 #pragma once
 #include <stdexcept>
+#include "errors.hpp"
 
 template <class T>
 class DynamicArray {
@@ -32,7 +33,7 @@ public:
 template <class T>
 DynamicArray<T>::DynamicArray(T* items, int count) {
     if (count < 0)
-        throw std::invalid_argument("Negative size not allowed");
+        throw Errors::NegativeSize();
 
     size = count;
     data = new T[size];
@@ -43,7 +44,7 @@ DynamicArray<T>::DynamicArray(T* items, int count) {
 template <class T>
 DynamicArray<T>::DynamicArray(int size) {
     if (size < 0)
-        throw std::invalid_argument("Negative size not allowed");
+        throw Errors::NegativeSize();
 
     this->size = size;
     data = new T[size];
@@ -65,7 +66,7 @@ DynamicArray<T>::~DynamicArray() {
 template <class T>
 T DynamicArray<T>::Get(int index) const {
     if (index < 0 || index >= size)
-        throw std::out_of_range("Index out of bounds");
+        throw Errors::IndexOutOfRange();
     return data[index];
 }
 
@@ -79,7 +80,7 @@ void DynamicArray<T>::Remove(int index) {
     if (size == 0) return;
 
     if (index < 0 || index >= size)
-        throw std::out_of_range("Index out of bounds");
+        throw Errors::IndexOutOfRange();
 
     for (int i = index; i < size - 1; ++i) {
         data[i] = data[i + 1];
@@ -92,14 +93,14 @@ void DynamicArray<T>::Remove(int index) {
 template <class T>
 void DynamicArray<T>::Set(int index, T value) {
     if (index < 0 || index >= size)
-        throw std::out_of_range("Index out of bounds");
+        throw Errors::IndexOutOfRange();
     data[index] = value;
 }
 
 template <class T>
 void DynamicArray<T>::Resize(int newSize) {
     if (newSize < 0)
-        throw std::invalid_argument("Negative size not allowed");
+        throw Errors::NegativeSize();
 
     T* newData = new T[newSize];
     int minSize = (newSize < size) ? newSize : size;
@@ -115,7 +116,7 @@ void DynamicArray<T>::Resize(int newSize) {
 template <class T>
 DynamicArray<T>* DynamicArray<T>::GetSubArray(int startIndex, int endIndex) const {
     if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
-        throw std::out_of_range("Invalid subarray indices");
+        throw Errors::InvalidIndices();
 
     int count = endIndex - startIndex + 1;
     T* subData = new T[count];
@@ -131,13 +132,13 @@ DynamicArray<T>* DynamicArray<T>::GetSubArray(int startIndex, int endIndex) cons
 template <class T>
 T& DynamicArray<T>::operator[](int index) {
     if (index < 0 || index >= size)
-        throw std::out_of_range("Index out of bounds");
+        throw Errors::IndexOutOfRange();
     return data[index];
 }
 
 template <class T>
 const T& DynamicArray<T>::operator[](int index) const {
     if (index < 0 || index >= size)
-        throw std::out_of_range("Index out of bounds");
+        throw Errors::IndexOutOfRange();
     return data[index];
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include <stdexcept>
 
+#include "errors.hpp"
+
 template <class T>
 class LinkedList {
 private:
@@ -47,7 +49,7 @@ LinkedList<T>::LinkedList(){
 template <class T>
 LinkedList<T>::LinkedList(T* items, int count){
     if (count < 0){
-        throw std::invalid_argument("Negative_count");
+        throw Errors::NegativeCount();
     }
 
     if (count == 0) {
@@ -101,7 +103,7 @@ LinkedList<T>::~LinkedList(){
 template <class T>
 T LinkedList<T>::GetFirst() const{
     if(root == nullptr){
-        throw std::range_error("The LinkedList is empty");
+        throw Errors::EmptyList();
     }
 
     return root->data;
@@ -110,7 +112,7 @@ T LinkedList<T>::GetFirst() const{
 template <class T>
 T LinkedList<T>::GetLast() const{
     if(root == nullptr){
-        throw std::range_error("The LinkedList is empty");
+        throw Errors::EmptyList();
     }
 
     Node* cur = root;
@@ -125,11 +127,11 @@ T LinkedList<T>::GetLast() const{
 template <class T>
 T LinkedList<T>::Get(int index) const{
     if(root == nullptr){
-        throw std::range_error("The LinkedList is empty");
+        throw Errors::EmptyList();
     }
 
     if(index < 0 || index >= size){
-        throw std::out_of_range("index out of range");
+        throw Errors::IndexOutOfRange();
     }
 
     if(index == 0){
@@ -146,7 +148,7 @@ T LinkedList<T>::Get(int index) const{
 template <class T>
 LinkedList<T>* LinkedList<T>::GetSubList(int startIndex, int endIndex) const {
     if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
-        throw std::out_of_range("Invalid start or end index");
+        throw Errors::InvalidIndices();
 
     LinkedList<T>* sublist = new LinkedList<T>();
     Node* current = root;
@@ -198,7 +200,7 @@ void LinkedList<T>::Prepend(T item){
 template <class T>
 void LinkedList<T>::InsertAt(T item, int index){
     if(index>size || index<0){
-        throw std::out_of_range("Index out of range");
+        throw Errors::IndexOutOfRange();
     }
     Node* cur = root;
     Node* newNode = new Node{item};
@@ -220,7 +222,7 @@ template <class T>
 void LinkedList<T>::Remove(int index){
     if(size == 0) return;
     
-    if(index<0 || index>=size) throw std::out_of_range("Index out of range");
+    if(index<0 || index>=size) throw Errors::IndexOutOfRange();
 
     Node* cur = root;
     Node* tmp;
@@ -241,7 +243,7 @@ void LinkedList<T>::Remove(int index){
 
 template <class T>
 LinkedList<T>* LinkedList<T>::Concat(LinkedList<T>* list){
-    if (list == nullptr) throw std::invalid_argument("Null list passed to Concat");
+    if (list == nullptr) throw Errors::NullList();
 
     LinkedList<T>* result = new LinkedList<T>(*this);
     Node* cur = list->root;

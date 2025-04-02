@@ -5,6 +5,8 @@
 #include <typeinfo>
 #include <stdexcept>
 
+#include "errors.hpp"
+
 class BoxedAny {
 private:
     std::any value;
@@ -17,7 +19,7 @@ public:
 
     template<typename T>
     T& As() {
-        if (!value.has_value()) throw std::runtime_error("Value is empty");
+        if (!value.has_value()) throw Errors::EmptyValue();
         if (value.type() != typeid(T)) throw std::bad_any_cast();
         return std::any_cast<T&>(value);
     }

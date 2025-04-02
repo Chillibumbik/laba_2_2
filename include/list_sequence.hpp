@@ -48,7 +48,7 @@ public:
 
     Sequence<T>* Concat(Sequence<T>* other) const override {
         auto otherList = dynamic_cast<const MutableListSequence<T>*>(other);
-        if (!otherList) throw std::invalid_argument("Incompatible sequence types");
+        if (!otherList) throw Errors::IncompatibleTypes();
         LinkedList<T>* result = list->Concat(otherList->list);
         return CreateFromList(result);
     }
@@ -104,9 +104,9 @@ public:
         return this->Clone()->Remove(index);
     }
 
-    Sequence<T>* AppendInternal(T) override { throw std::logic_error("Immutable"); }
-    Sequence<T>* PrependInternal(T) override { throw std::logic_error("Immutable"); }
-    Sequence<T>* InsertAtInternal(T, int) override { throw std::logic_error("Immutable"); }
+    Sequence<T>* AppendInternal(T) override { throw Errors::Immutable(); }
+    Sequence<T>* PrependInternal(T) override { throw Errors::Immutable(); }
+    Sequence<T>* InsertAtInternal(T, int) override { throw Errors::Immutable(); }
 
     Sequence<T>* Instance() override { return this->Clone(); }
     Sequence<T>* Clone() const override {

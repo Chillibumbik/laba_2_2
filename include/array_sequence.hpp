@@ -2,6 +2,7 @@
 
 #include "sequence.hpp"
 #include "dynamic_array.hpp"
+#include "errors.hpp"
 #include <stdexcept>
 
 // Изменяемая версия — базовый класс
@@ -37,12 +38,12 @@ public:
     }
 
     T GetFirst() const override {
-        if (GetLength() == 0) throw std::out_of_range("Empty array");
+        if (GetLength() == 0) throw Errors::EmptyArray();
         return items->Get(0);
     }
 
     T GetLast() const override {
-        if (GetLength() == 0) throw std::out_of_range("Empty array");
+        if (GetLength() == 0) throw Errors::EmptyArray();
         return items->Get(GetLength() - 1);
     }
 
@@ -61,7 +62,7 @@ public:
 
     Sequence<T>* Concat(Sequence<T>* other) const override {
         auto otherArray = dynamic_cast<const MutableArraySequence<T>*>(other);
-        if (!otherArray) throw std::invalid_argument("Incompatible sequence types");
+        if (!otherArray) throw Errors::IncompatibleTypes();
 
         int totalSize = GetLength() + otherArray->GetLength();
         DynamicArray<T>* result = new DynamicArray<T>(totalSize);
@@ -91,7 +92,7 @@ public:
 
     Sequence<T>* InsertAt(T item, int index) override {
         int size = items->GetSize();
-        if (index < 0 || index > size) throw std::out_of_range("Invalid index");
+        if (index < 0 || index > size) throw Errors::IndexOutOfRange();
         items->Resize(size + 1);
         for (int i = size; i > index; i--) {
             items->Set(i, items->Get(i - 1));
@@ -136,9 +137,9 @@ public:
         return this->Clone()->Remove(index);
     }
 
-    Sequence<T>* AppendInternal(T) override { throw std::logic_error("Immutable"); }
-    Sequence<T>* PrependInternal(T) override { throw std::logic_error("Immutable"); }
-    Sequence<T>* InsertAtInternal(T, int) override { throw std::logic_error("Immutable"); }
+    Sequence<T>* AppendInternal(T) override { throw Errors::Immutable(); }
+    Sequence<T>* PrependInternal(T) override { throw Errors::Immutable(); }
+    Sequence<T>* InsertAtInternal(T, int) override { throw Errors::Immutable(); }
 
     Sequence<T>* Instance() override { return this->Clone(); }
     Sequence<T>* Clone() const override {
