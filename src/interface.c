@@ -1,9 +1,4 @@
 #include <iostream>
-#include <string>
-#include <limits>
-#include "array_sequence.hpp"
-#include "list_sequence.hpp"
-#include "boxed_any.hpp"
 
 using namespace std;
 
@@ -76,7 +71,9 @@ void ShowSequence(Sequence<T>* seq) {
     cout << " ]\n";
 }
 
-int main() {
+
+
+void start_interface(){
     cout << "Choose sequence type:\n1. Mutable ArraySequence\n2. Mutable ListSequence\n> ";
     int type;
 
@@ -188,21 +185,4 @@ int main() {
 
     delete seq;
     cout << "Goodbye!\n";
-    return 0;
 }
-
-//main пустой(функции в отдельные файлы закинуть)
-//не везде const в аргументах(напимер concat)
-//ошибки - так не надо(сделать как у володи(в телефоне лежит))
-//concat работает за линию, а можно за константу (очень просто)
-//в dynamicArray->remove - сдвиги лишние (можно перенести сразу)
-//сделайте перегрузку для concat (оператор +)
-//arraySequence - где capacity? для чего это нужно? (это аналог std::vector)
-//зачем явно вызывать delete?
-//тесты (существуют (сарказм)) - сделать нормальные
-//везде сначала объявление, а потом реализация(для последовательностей нарушил)
-//хочу как в первой лабе список последовательностей, чтобы можно было разные последовательности выбирать
-//добавить пользовательский тип - какую-нибудь структуру (например, user)
-//когда у меня спрашивают индекс - пусть скажут, в каких пределах он может изменяться
-//подпоследовательность и сконкатинированна пос-ть сохраняются в новую пос-ть
-
