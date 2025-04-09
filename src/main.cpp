@@ -124,11 +124,15 @@ int main() {
             case 4: // Remove element
                 cout << "Enter index: ";
                 cin >> index;
+
                 try {
                     seq = seq->Remove(index);
                     cout << "Element has been removed";                 
                 }catch(exception& e){
                     cout << "Error: " << e.what() << endl;
+                    if (seq->GetLength() != 0){
+                    cout << "Chose index from 0" << " to " << (seq->GetLength()-1) << endl;
+                    }
                 }
                 break;
             case 5: // Insert element at index
@@ -139,6 +143,11 @@ int main() {
                     seq = seq->InsertAt(value, index);
                 } catch (exception& e) {
                     cout << "Error: " << e.what() << endl;
+                    if (seq->GetLength() == 0){
+                        cout << "       Empty sequence" << endl;
+                    }else{
+                        cout << "Chose index from 0" << " to " << (seq->GetLength()-1) << endl;                      
+                    }
                 }
                 break;
             
@@ -149,6 +158,11 @@ int main() {
                     cout << "Element: " << seq->Get(index) << endl;
                 } catch (exception& e) {
                     cout << "Error: " << e.what() << endl;
+                    if (seq->GetLength() == 0){
+                        cout << "       Empty sequence" << endl;
+                    }else{
+                        cout << "Chose index from 0" << " to " << (seq->GetLength()-1) << endl;                      
+                    }
                 }
                 break;
             case 7: // Get subsequence
@@ -160,9 +174,13 @@ int main() {
                     Sequence<BoxedAny>* sub = seq->GetSubsequence(start, end);
                     cout << "Subsequence: ";
                     ShowSequence(sub);
-                    delete sub;
                 } catch (exception& e) {
                     cout << "Error: " << e.what() << endl;
+                    if (seq->GetLength() == 0){
+                        cout << "       Empty sequence" << endl;
+                    }else{
+                        cout << "Chose indeces from 0" << " to " << (seq->GetLength()-1) << endl;                        
+                    }
                 }
                 break;
             case 8: { // Concat another sequence
@@ -177,7 +195,6 @@ int main() {
                     other = other->Append(v);
                 }
                 seq = seq->Concat(other);
-                delete other;
                 break;
             }
             default:
@@ -186,23 +203,22 @@ int main() {
         }
     }
 
-    delete seq;
     cout << "Goodbye!\n";
     return 0;
 }
 
 //main пустой(функции в отдельные файлы закинуть)
-//не везде const в аргументах(напимер concat)
-//ошибки - так не надо(сделать как у володи(в телефоне лежит))
-//concat работает за линию, а можно за константу (очень просто)
+//не везде const в аргументах(напимер concat) ---ВЫПОЛНЕНО---
+//ошибки - так не надо(сделать как у володи(в телефоне лежит)) - Не могу, ибо ловлю ошибки
+//concat работает за линию, а можно за константу (очень просто) ---ВЫПОЛНЕНО---
 //в dynamicArray->remove - сдвиги лишние (можно перенести сразу)
-//сделайте перегрузку для concat (оператор +)
+//сделайте перегрузку для concat (оператор +) ---ВЫПОЛНЕНО---
 //arraySequence - где capacity? для чего это нужно? (это аналог std::vector)
-//зачем явно вызывать delete?
+//зачем явно вызывать delete? --- ВЫПОЛНЕНО---
 //тесты (существуют (сарказм)) - сделать нормальные
 //везде сначала объявление, а потом реализация(для последовательностей нарушил)
 //хочу как в первой лабе список последовательностей, чтобы можно было разные последовательности выбирать
 //добавить пользовательский тип - какую-нибудь структуру (например, user)
-//когда у меня спрашивают индекс - пусть скажут, в каких пределах он может изменяться
+//когда у меня спрашивают индекс - пусть скажут, в каких пределах он может изменяться ---ВЫПОЛНЕНО---
 //подпоследовательность и сконкатинированна пос-ть сохраняются в новую пос-ть
 

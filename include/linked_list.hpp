@@ -14,6 +14,7 @@ private:
     };
 
     Node* root;
+    Node* tail;
     int size;
 
 public:
@@ -32,7 +33,7 @@ public:
     void Prepend(T item);
     void InsertAt(T item, int index);
     void Remove(int index);
-    LinkedList<T>* Concat(LinkedList<T>* list);
+    LinkedList<T>* Concat(const LinkedList<T>* list);
 };
 
 
@@ -44,6 +45,7 @@ template <class T>
 LinkedList<T>::LinkedList(){
     root = nullptr;
     size = 0;
+    tail = nullptr;
 }
 
 template <class T>
@@ -55,6 +57,7 @@ LinkedList<T>::LinkedList(T* items, int count){
     if (count == 0) {
         root = nullptr;
         size = 0;
+        tail = nullptr;
         return;
     }
 
@@ -67,6 +70,8 @@ LinkedList<T>::LinkedList(T* items, int count){
         current->next = newNode;
         current = newNode;
     }
+
+    tail = current;
 }
 
 template <class T>
@@ -74,6 +79,7 @@ LinkedList<T>::LinkedList(const LinkedList<T>& list){
     if (list.root == nullptr) {
         root = nullptr;
         size = 0;
+        tail = nullptr;
         return;
     }
 
@@ -87,6 +93,8 @@ LinkedList<T>::LinkedList(const LinkedList<T>& list){
         currentOther = currentOther->next;
     }
 
+    tail = currentThis;
+    tail->next = nullptr;
     size = list.size;
 }
 
@@ -178,7 +186,7 @@ void LinkedList<T>::Append(T item){
    
     Node* newNode = new Node{item, nullptr};  
     if(root == nullptr){
-        root = newNode;
+        root = newNode;      
     }else{
         Node* cur = root;
         while (cur->next != nullptr)
@@ -187,6 +195,7 @@ void LinkedList<T>::Append(T item){
         }
         cur->next = newNode;
     }
+    tail = newNode;
     size++;
 }
 
@@ -220,7 +229,7 @@ void LinkedList<T>::InsertAt(T item, int index){
 
 template <class T>
 void LinkedList<T>::Remove(int index){
-    if(size == 0) return;
+    if(size == 0) throw Errors::EmptyList();
     
     if(index<0 || index>=size) throw Errors::IndexOutOfRange();
 
@@ -242,8 +251,8 @@ void LinkedList<T>::Remove(int index){
 }
 
 template <class T>
-LinkedList<T>* LinkedList<T>::Concat(LinkedList<T>* list){
-    if (list == nullptr) throw Errors::NullList();
+LinkedList<T>* LinkedList<T>::Concat(const LinkedList<T>* list){
+/*     if (list == nullptr) throw Errors::NullList();
 
     LinkedList<T>* result = new LinkedList<T>(*this);
     Node* cur = list->root;
@@ -251,5 +260,14 @@ LinkedList<T>* LinkedList<T>::Concat(LinkedList<T>* list){
         result->Append(cur->data);
         cur = cur->next;
     }
-    return result;  
+    return result;   */
+    if (list == nullptr) throw Errors::NullList();
+    
+    LinkedList<T>* result = new LinkedList<T>(*this);
+    result->tail->next = list->root;
+
+    result->size += list->size;
+    result->tail = list->tail;
+    return result;
+
 }

@@ -60,7 +60,7 @@ public:
         return CreateFromArray(sub);
     }
 
-    Sequence<T>* Concat(Sequence<T>* other) const override {
+    Sequence<T>* Concat(const Sequence<T>* other) const override {
         auto otherArray = dynamic_cast<const MutableArraySequence<T>*>(other);
         if (!otherArray) throw Errors::IncompatibleTypes();
 
@@ -106,13 +106,19 @@ public:
         return this;
     }
 
-    Sequence<T>* AppendInternal(T item) override { return Append(item); }
-    Sequence<T>* PrependInternal(T item) override { return Prepend(item); }
-    Sequence<T>* InsertAtInternal(T item, int index) override { return InsertAt(item, index); }
 
     Sequence<T>* Instance() override { return this; }
     Sequence<T>* Clone() const override { return new MutableArraySequence<T>(*this); }
+
+
 };
+
+template <typename T>
+MutableArraySequence<T> operator+(const MutableArraySequence<T>& lhs, const MutableArraySequence<T>& rhs) {
+    Sequence<T>* result = lhs.Concat(&rhs); 
+    return result;  
+}
+
 
 // Неизменяемая версия
 
@@ -136,10 +142,6 @@ public:
     Sequence<T>* Remove(int index) override {
         return this->Clone()->Remove(index);
     }
-
-    Sequence<T>* AppendInternal(T) override { throw Errors::Immutable(); }
-    Sequence<T>* PrependInternal(T) override { throw Errors::Immutable(); }
-    Sequence<T>* InsertAtInternal(T, int) override { throw Errors::Immutable(); }
 
     Sequence<T>* Instance() override { return this->Clone(); }
     Sequence<T>* Clone() const override {

@@ -46,7 +46,7 @@ public:
         return CreateFromList(sub);
     }
 
-    Sequence<T>* Concat(Sequence<T>* other) const override {
+    Sequence<T>* Concat(const Sequence<T>* other) const override {
         auto otherList = dynamic_cast<const MutableListSequence<T>*>(other);
         if (!otherList) throw Errors::IncompatibleTypes();
         LinkedList<T>* result = list->Concat(otherList->list);
@@ -73,13 +73,26 @@ public:
         return this;
     }
 
-    Sequence<T>* AppendInternal(T item) override { return Append(item); }
-    Sequence<T>* PrependInternal(T item) override { return Prepend(item); }
-    Sequence<T>* InsertAtInternal(T item, int index) override { return InsertAt(item, index); }
-
     Sequence<T>* Instance() override { return this; }
     Sequence<T>* Clone() const override { return new MutableListSequence<T>(*this); }
+
 };
+
+/* template <typename T>
+MutableListSequence<T> operator+(const MutableListSequence<T>& lhs, const MutableListSequence<T>& rhs) {
+    MutableListSequence<T> result(lhs);  
+    for (int i = 0; i < rhs.GetLength(); ++i) {
+        result.Append(rhs.Get(i));   
+    }
+    return result;
+}
+ */
+
+ template <typename T>
+MutableListSequence<T> operator+(const MutableListSequence<T>& lhs, const MutableListSequence<T>& rhs) {
+    Sequence<T>* result = lhs.Concat(&rhs); 
+    return result;  
+}
 
 // Неизменяемая версия
 
@@ -104,9 +117,6 @@ public:
         return this->Clone()->Remove(index);
     }
 
-    Sequence<T>* AppendInternal(T) override { throw Errors::Immutable(); }
-    Sequence<T>* PrependInternal(T) override { throw Errors::Immutable(); }
-    Sequence<T>* InsertAtInternal(T, int) override { throw Errors::Immutable(); }
 
     Sequence<T>* Instance() override { return this->Clone(); }
     Sequence<T>* Clone() const override {

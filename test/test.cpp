@@ -61,7 +61,6 @@ TEST_CASE("LinkedList: Basic Operations", "[LinkedList]") {
     REQUIRE(sub->GetLength() == 2);
     REQUIRE(sub->Get(0) == 5);
     REQUIRE(sub->Get(1) == 1);
-    delete sub;
 
     REQUIRE_THROWS_AS(list.Get(10), std::out_of_range);
     REQUIRE_THROWS_AS(list.GetSubList(0, 10), std::out_of_range);
@@ -84,7 +83,6 @@ TEST_CASE("ArraySequence: Operations", "[ArraySequence]") {
     auto sub = seq.GetSubsequence(1, 3);
     REQUIRE(sub->GetLength() == 3);
     REQUIRE(sub->Get(0) == 5);
-    delete sub;
 }
 
 TEST_CASE("ListSequence: Operations", "[ListSequence]") {
@@ -104,6 +102,32 @@ TEST_CASE("ListSequence: Operations", "[ListSequence]") {
     auto sub = seq.GetSubsequence(1, 3);
     REQUIRE(sub->GetLength() == 3);
     REQUIRE(sub->Get(0) == 5);
-    delete sub;
 }
 
+TEST_CASE("Sequence: Operators", "[Sequence]") {
+    MutableListSequence<int> seq1;
+    seq1.Append(1);
+    seq1.Append(2);
+    seq1.Prepend(0);
+
+    MutableListSequence<int> seq2;
+    seq2.Append(12);
+    seq2.Append(3122);
+    seq2.Prepend(7);
+
+    MutableListSequence<int> seq3 = seq1 + seq2;
+    REQUIRE(seq3.GetLength() == 6);
+    REQUIRE(seq3.Get(0) == 0);
+
+
+    MutableArraySequence<int> arr1;
+    arr1.Append(1);
+    arr1.Append(212);
+
+    MutableArraySequence<int> arr2;
+    arr2.Append(8);
+
+    MutableArraySequence<int> arr3 = arr1 + arr2;
+    REQUIRE(arr3.GetLength() == 3);
+    REQUIRE(arr3.Get(0) == 1);
+}

@@ -77,7 +77,7 @@ int DynamicArray<T>::GetSize() const {
 
 template <class T>
 void DynamicArray<T>::Remove(int index) {
-    if (size == 0) return;
+    if (size == 0) throw Errors::EmptyArray();
 
     if (index < 0 || index >= size)
         throw Errors::IndexOutOfRange();
