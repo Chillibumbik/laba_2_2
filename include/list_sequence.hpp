@@ -89,10 +89,13 @@ MutableListSequence<T> operator+(const MutableListSequence<T>& lhs, const Mutabl
  */
 
  template <typename T>
-MutableListSequence<T> operator+(const MutableListSequence<T>& lhs, const MutableListSequence<T>& rhs) {
-    Sequence<T>* result = lhs.Concat(&rhs); 
-    return result;  
-}
+ MutableListSequence<T> operator+(const MutableListSequence<T>& lhs, const MutableListSequence<T>& rhs) {
+     Sequence<T>* resultBase = lhs.Concat(&rhs); // вернёт через CreateFromList
+     auto* result = static_cast<MutableListSequence<T>*>(resultBase); // cast
+     MutableListSequence<T> copy = *result;  // копируем в объект
+     delete result;                          // освобождаем временный
+     return copy;
+ }
 
 // Неизменяемая версия
 
@@ -102,15 +105,15 @@ public:
     using MutableListSequence<T>::MutableListSequence;
 
     Sequence<T>* Append(T item) override {
-        return this->Clone()->AppendInternal(item);
+        return this->Clone()->Append(item);
     }
 
     Sequence<T>* Prepend(T item) override {
-        return this->Clone()->PrependInternal(item);
+        return this->Clone()->Prepend(item);
     }
 
     Sequence<T>* InsertAt(T item, int index) override {
-        return this->Clone()->InsertAtInternal(item, index);
+        return this->Clone()->InsertAt(item, index);
     }
 
     Sequence<T>* Remove(int index) override {
@@ -123,3 +126,12 @@ public:
         return new ImmutableListSequence<T>(*this);
     }
 };
+
+template <typename T>
+ImmutableListSequence<T> operator+(const ImmutableListSequence<T>& lhs, const ImmutableListSequence<T>& rhs) {
+    Sequence<T>* resultBase = lhs.Concat(&rhs); // вернёт через CreateFromList
+    auto* result = static_cast<ImmutableListSequence<T>*>(resultBase); // cast
+    ImmutableListSequence<T> copy = *result;  // копируем в объект
+    delete result;                          // освобождаем временный
+    return copy;
+}

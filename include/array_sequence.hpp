@@ -115,8 +115,11 @@ public:
 
 template <typename T>
 MutableArraySequence<T> operator+(const MutableArraySequence<T>& lhs, const MutableArraySequence<T>& rhs) {
-    Sequence<T>* result = lhs.Concat(&rhs); 
-    return result;  
+    Sequence<T>* resultBase = lhs.Concat(&rhs); // вернёт через CreateFromArray
+    auto* result = static_cast<MutableArraySequence<T>*>(resultBase); // cast
+    MutableArraySequence<T> copy = *result;  // копируем в объект
+    delete result;                          // освобождаем временный
+    return copy;
 }
 
 
@@ -128,15 +131,15 @@ public:
     using MutableArraySequence<T>::MutableArraySequence;
 
     Sequence<T>* Append(T item) override {
-        return this->Clone()->AppendInternal(item);
+        return this->Clone()->Append(item);
     }
 
     Sequence<T>* Prepend(T item) override {
-        return this->Clone()->PrependInternal(item);
+        return this->Clone()->Prepend(item);
     }
 
     Sequence<T>* InsertAt(T item, int index) override {
-        return this->Clone()->InsertAtInternal(item, index);
+        return this->Clone()->InsertAt(item, index);
     }
 
     Sequence<T>* Remove(int index) override {
@@ -148,3 +151,12 @@ public:
         return new ImmutableArraySequence<T>(*this);
     }
 };
+
+template <typename T>
+ImmutableArraySequence<T> operator+(const ImmutableArraySequence<T>& lhs, const ImmutableArraySequence<T>& rhs) {
+    Sequence<T>* resultBase = lhs.Concat(&rhs); // вернёт через CreateFromArray
+    auto* result = static_cast<ImmutableArraySequence<T>*>(resultBase); // cast
+    ImmutableArraySequence<T> copy = *result;  // копируем в объект
+    delete result;                          // освобождаем временный
+    return copy;
+}

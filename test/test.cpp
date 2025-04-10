@@ -130,4 +130,17 @@ TEST_CASE("Sequence: Operators", "[Sequence]") {
     MutableArraySequence<int> arr3 = arr1 + arr2;
     REQUIRE(arr3.GetLength() == 3);
     REQUIRE(arr3.Get(0) == 1);
+
+
+    ImmutableArraySequence<std::string> imarr1;
+    imarr1.Append("fd")->Append("qual");
+
+    ImmutableArraySequence<std::string> imarr2;
+    imarr2.Append("daddy")->Append("^_^");
+
+    ImmutableArraySequence<std::string> imarr3 = imarr1 + imarr2;
+
+    REQUIRE(imarr3.GetLast() == "^_^");
+    REQUIRE(imarr2.GetFirst() == "daddy");
+
 }
