@@ -7,7 +7,6 @@ class DynamicArray {
 private:
     T* data;
     int size;
-    int capacity;
 
 public:
 //    DynamicArray(); можно сделать, если сделать, чтобы вылетало уведомление о пропущенных полях
@@ -18,7 +17,6 @@ public:
 
     T Get(int index) const;
     int GetSize() const;
-    int GetCapacity() const;
 
     void Remove(int index);
 
@@ -38,7 +36,6 @@ DynamicArray<T>::DynamicArray(T* items, int count) {
         throw Errors::NegativeSize();
 
     size = count;
-    capacity = count;
     data = new T[size];
     for (int i = 0; i < size; i++)
         data[i] = items[i];
@@ -49,15 +46,13 @@ DynamicArray<T>::DynamicArray(int size) {
     if (size < 0)
         throw Errors::NegativeSize();
 
-    this->size = 0;
-    this->capacity = size;
+    this->size = size;
     data = new T[size];
 }
 
 template <class T>
 DynamicArray<T>::DynamicArray(const DynamicArray<T>& other) {
     size = other.size;
-    capacity = other.capacity;
     data = new T[size];
     for (int i = 0; i < size; i++)
         data[i] = other.data[i];
@@ -81,13 +76,8 @@ int DynamicArray<T>::GetSize() const {
 }
 
 template <class T>
-int DynamicArray<T>::GetCapacity() const {
-    return capacity;
-}
-
-template <class T>
 void DynamicArray<T>::Remove(int index) {
-    if (size == 0) throw Errors::EmptyArray();
+    if (size == 0) return;
 
     if (index < 0 || index >= size)
         throw Errors::IndexOutOfRange();
@@ -120,7 +110,6 @@ void DynamicArray<T>::Resize(int newSize) {
 
     delete[] data;
     data = newData;
-    capacity = newSize;
     size = newSize;
 }
 

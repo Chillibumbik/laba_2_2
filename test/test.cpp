@@ -53,6 +53,8 @@ TEST_CASE("LinkedList: Basic Operations", "[LinkedList]") {
     REQUIRE(list.GetLast() == 2);
     REQUIRE(list.Get(1) == 1);
 
+    REQUIRE(list.GetTail() == 2);
+
     list.InsertAt(5, 1);
     REQUIRE(list.Get(1) == 5);
     REQUIRE(list.Get(2) == 1);

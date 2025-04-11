@@ -25,6 +25,7 @@ public:
 
     T GetFirst() const;
     T GetLast() const;
+    T GetTail() const;
     T Get(int index) const;
     LinkedList<T>* GetSubList(int startIndex, int endIndex) const;
     int GetLength() const;
@@ -130,6 +131,11 @@ T LinkedList<T>::GetLast() const{
     }
 
     return cur->data;
+}
+
+template <class T>
+T LinkedList<T>::GetTail() const {
+    return tail->data;
 }
 
 template <class T>
@@ -269,5 +275,4 @@ LinkedList<T>* LinkedList<T>::Concat(const LinkedList<T>* list){
     result->size += list->size;
     result->tail = list->tail;
     return result;
-
 }

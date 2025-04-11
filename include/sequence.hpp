@@ -19,7 +19,7 @@ public:
     virtual Sequence<T>* Append(T item) = 0;
     virtual Sequence<T>* Prepend(T item) = 0;
     virtual Sequence<T>* InsertAt(T item, int index) = 0;
-    virtual Sequence<T>* Concat(const Sequence<T>* list) const = 0;
+    virtual Sequence<T>* Concat(const Sequence<T>* other) const = 0;
     
     virtual Sequence<T>* Instance() = 0;
     virtual Sequence<T>* Clone() const = 0;

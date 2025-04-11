@@ -106,11 +106,8 @@ public:
         return this;
     }
 
-
     Sequence<T>* Instance() override { return this; }
     Sequence<T>* Clone() const override { return new MutableArraySequence<T>(*this); }
-
-
 };
 
 template <typename T>
