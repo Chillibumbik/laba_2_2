@@ -86,7 +86,7 @@ void DynamicArray<T>::Remove(int index) {
         data[i] = data[i + 1];
     }
 
-    Resize(size - 1);
+    size--;
 }
 
 

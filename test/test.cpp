@@ -121,6 +121,9 @@ TEST_CASE("Sequence: Operators", "[Sequence]") {
     REQUIRE(seq3.GetLength() == 6);
     REQUIRE(seq3.Get(0) == 0);
 
+    seq1.Remove(1);
+    REQUIRE(seq1.Get(1) == 2);
+
 
     MutableArraySequence<int> arr1;
     arr1.Append(1);
