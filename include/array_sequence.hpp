@@ -102,8 +102,12 @@ public:
     }
 
     Sequence<T>* Remove(int index) override {
-        items->Remove(index);
-        return this;
+        if (items->GetSize() != 0 ){
+            items->Remove(index);
+            return this;
+        } else{
+            throw Errors::EmptyArray();
+        }
     }
 
     Sequence<T>* Instance() override { return this; }

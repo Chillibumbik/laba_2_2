@@ -22,13 +22,15 @@ TEST_CASE("DynamicArray: Basic Operations", "[DynamicArray]") {
     arr.Set(1, 20);
     arr.Set(2, 30);
 
+    //REQUIRE(arr.GetCapacity() == 6);
     REQUIRE(arr.GetSize() == 3);
-    REQUIRE(arr.Get(0) == 10);
+    REQUIRE(arr[0] == 10);
     REQUIRE(arr.Get(1) == 20);
     REQUIRE(arr.Get(2) == 30);
 
     arr.Resize(5);
     REQUIRE(arr.GetSize() == 5);
+    //REQUIRE(arr.GetCapacity() == 10);
 
     arr.Resize(2);
     REQUIRE(arr.GetSize() == 2);

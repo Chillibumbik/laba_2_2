@@ -64,8 +64,12 @@ public:
     }
 
     Sequence<T>* Remove(int index) override {
-        list->Remove(index);
-        return this;
+        if (list->GetLength() != 0 ){
+            list->Remove(index);
+            return this;
+        } else{
+            throw Errors::EmptyList();
+        }
     }
 
     Sequence<T>* InsertAt(T item, int index) override {
