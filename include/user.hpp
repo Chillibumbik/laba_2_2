@@ -28,8 +28,8 @@ struct User {
         std::cout << "Enter id: ";
         is >> user.id;
 
-        while (user.age < 0) {
-            std::cout << "Age cannot be negative. Try again: ";
+        while (user.age < 0 || user.age > 150) {
+            std::cout << "Age cannot be negative or more than 150. Try again: ";
             is >> user.age;
         }
 

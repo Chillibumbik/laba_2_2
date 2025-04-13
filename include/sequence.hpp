@@ -1,7 +1,8 @@
-// sequence.hpp
+
 #pragma once
 
 #include <stdexcept>
+#include "errors.hpp"
 
 template <class T>
 class Sequence {
@@ -24,3 +25,11 @@ public:
     virtual Sequence<T>* Instance() = 0;
     virtual Sequence<T>* Clone() const = 0;
 };
+
+template<typename T>
+Sequence<T>* operator+(const Sequence<T>& lhs, const Sequence<T>& rhs) {
+    if (typeid(lhs) != typeid(rhs))
+        throw Errors::ConcatTypeMismatchError();
+
+    return lhs.Concat(&rhs);
+}

@@ -48,5 +48,8 @@ namespace Errors {
         return std::invalid_argument("Null list");
     }
 
+    inline std::logic_error ConcatTypeMismatchError() {
+        return std::logic_error("Cannot concat sequences of different types");
+    }
 
 }
