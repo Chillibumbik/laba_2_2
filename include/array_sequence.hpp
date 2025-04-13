@@ -14,7 +14,7 @@ protected:
 
     Sequence<T>* CreateFromArray(DynamicArray<T>* array) const {
         return new MutableArraySequence<T>(*array);
-    }
+    } 
 
 public:
     MutableArraySequence() {
@@ -57,7 +57,9 @@ public:
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) const override {
         DynamicArray<T>* sub = items->GetSubArray(startIndex, endIndex);
-        return CreateFromArray(sub);
+        auto* result = new MutableArraySequence<T>(*sub);
+        delete sub;
+        return result;
     }
 
     Sequence<T>* Concat(const Sequence<T>* other) const override {
@@ -116,10 +118,10 @@ public:
 
 template <typename T>
 MutableArraySequence<T> operator+(const MutableArraySequence<T>& lhs, const MutableArraySequence<T>& rhs) {
-    Sequence<T>* resultBase = lhs.Concat(&rhs); // вернёт через CreateFromArray
-    auto* result = static_cast<MutableArraySequence<T>*>(resultBase); // cast
-    MutableArraySequence<T> copy = *result;  // копируем в объект
-    delete result;                          // освобождаем временный
+    Sequence<T>* resultBase = lhs.Concat(&rhs);
+    auto* result = static_cast<MutableArraySequence<T>*>(resultBase);
+    MutableArraySequence<T> copy(*result); 
+    delete result;
     return copy;
 }
 
@@ -131,17 +133,40 @@ class ImmutableArraySequence : public MutableArraySequence<T> {
 public:
     using MutableArraySequence<T>::MutableArraySequence;
 
+    Sequence<T>* Concat(const Sequence<T>* other) const override {
+        const auto* otherArr = dynamic_cast<const ImmutableArraySequence<T>*>(other);
+        if (!otherArr) throw Errors::IncompatibleTypes();
+    
+        int totalSize = this->GetLength() + otherArr->GetLength();
+        DynamicArray<T> combined(totalSize);
+    
+        for (int i = 0; i < this->GetLength(); ++i)
+            combined.Set(i, this->Get(i));
+        for (int j = 0; j < otherArr->GetLength(); ++j)
+            combined.Set(j + this->GetLength(), otherArr->Get(j));
+    
+        return new ImmutableArraySequence<T>(combined);
+    }
+
     Sequence<T>* Append(T item) override {
-        return this->Clone()->Append(item);
+        auto* clone = new ImmutableArraySequence<T>(*this);
+        clone->MutableArraySequence<T>::Append(item); 
+        return clone;   
     }
 
     Sequence<T>* Prepend(T item) override {
-        return this->Clone()->Prepend(item);
+        auto* clone = new ImmutableArraySequence<T>(*this);
+        clone->MutableArraySequence<T>::Prepend(item); 
+        return clone;
+
     }
 
     Sequence<T>* InsertAt(T item, int index) override {
-        return this->Clone()->InsertAt(item, index);
-    }
+        auto* clone = new ImmutableArraySequence<T>(*this);
+        clone->MutableArraySequence<T>::InsertAt(item, index); 
+        return clone;
+        }
+
 
     Sequence<T>* Remove(int index) override {
         return this->Clone()->Remove(index);
@@ -155,9 +180,10 @@ public:
 
 template <typename T>
 ImmutableArraySequence<T> operator+(const ImmutableArraySequence<T>& lhs, const ImmutableArraySequence<T>& rhs) {
-    Sequence<T>* resultBase = lhs.Concat(&rhs); // вернёт через CreateFromArray
-    auto* result = static_cast<ImmutableArraySequence<T>*>(resultBase); // cast
-    ImmutableArraySequence<T> copy = *result;  // копируем в объект
-    delete result;                          // освобождаем временный
+    Sequence<T>* resultBase = lhs.Concat(&rhs);  
+    auto* result = dynamic_cast<ImmutableArraySequence<T>*>(resultBase);
+    if (!result) throw std::runtime_error("Invalid Concat result type");
+    ImmutableArraySequence<T> copy(*result);
+    delete result;
     return copy;
 }

@@ -22,7 +22,7 @@ TEST_CASE("DynamicArray: Basic Operations", "[DynamicArray]") {
     arr.Set(1, 20);
     arr.Set(2, 30);
 
-    //REQUIRE(arr.GetCapacity() == 6);
+    REQUIRE(arr.GetCapacity() == 3);
     REQUIRE(arr.GetSize() == 3);
     REQUIRE(arr[0] == 10);
     REQUIRE(arr.Get(1) == 20);
@@ -30,7 +30,7 @@ TEST_CASE("DynamicArray: Basic Operations", "[DynamicArray]") {
 
     arr.Resize(5);
     REQUIRE(arr.GetSize() == 5);
-    //REQUIRE(arr.GetCapacity() == 10);
+    REQUIRE(arr.GetCapacity() == 5);
 
     arr.Resize(2);
     REQUIRE(arr.GetSize() == 2);
@@ -140,14 +140,25 @@ TEST_CASE("Sequence: Operators", "[Sequence]") {
 
 
     ImmutableArraySequence<std::string> imarr1;
-    imarr1.Append("fd")->Append("qual");
+    auto* im1_temp = imarr1.Append("fd");
+    auto* imarr1_final = im1_temp->Append("qual");
+    delete im1_temp;
+
 
     ImmutableArraySequence<std::string> imarr2;
-    imarr2.Append("daddy")->Append("^_^");
+    auto* im2_temp = imarr2.Append("daddy");
+    auto* imarr2_final = im2_temp->Append("^_^");
+    delete im2_temp;
+    
 
-    ImmutableArraySequence<std::string> imarr3 = imarr1 + imarr2;
+    ImmutableArraySequence<std::string> imarr3 = 
+    *static_cast<ImmutableArraySequence<std::string>*>(imarr1_final) + 
+    *static_cast<ImmutableArraySequence<std::string>*>(imarr2_final);
 
+
+    REQUIRE(imarr3.GetLength() == 4); 
     REQUIRE(imarr3.GetLast() == "^_^");
-    REQUIRE(imarr2.GetFirst() == "daddy");
+    REQUIRE(imarr3.Get(0) == "fd");
+    REQUIRE(imarr2_final->GetFirst() == "daddy");
 
 }
