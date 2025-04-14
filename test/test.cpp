@@ -5,7 +5,6 @@
 #include "linked_list.hpp"
 #include "array_sequence.hpp"
 #include "list_sequence.hpp"
-#include "boxed_any.hpp"
 
 /*
 Макрос	Что делает
