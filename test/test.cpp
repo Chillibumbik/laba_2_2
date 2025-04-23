@@ -6,6 +6,7 @@
 #include "array_sequence.hpp"
 #include "list_sequence.hpp"
 
+
 /*
 Макрос	Что делает
 REQUIRE(x)	Проверяет, что x == true. Если нет — стоп.
@@ -21,20 +22,21 @@ TEST_CASE("DynamicArray: Basic Operations", "[DynamicArray]") {
     arr.Set(1, 20);
     arr.Set(2, 30);
 
-    REQUIRE(arr.GetCapacity() == 3);
-    REQUIRE(arr.GetSize() == 3);
-    REQUIRE(arr[0] == 10);
-    REQUIRE(arr.Get(1) == 20);
-    REQUIRE(arr.Get(2) == 30);
+    DynamicArray<int> expected1(3);
+    expected1.Set(0, 10);
+    expected1.Set(1, 20);
+    expected1.Set(2, 30);
+    REQUIRE(arr == expected1);
 
     arr.Resize(5);
     REQUIRE(arr.GetSize() == 5);
     REQUIRE(arr.GetCapacity() == 5);
 
     arr.Resize(2);
-    REQUIRE(arr.GetSize() == 2);
-    REQUIRE(arr.Get(0) == 10);
-    REQUIRE(arr.Get(1) == 20);
+    DynamicArray<int> expected2(2);
+    expected2.Set(0, 10);
+    expected2.Set(1, 20);
+    REQUIRE(arr == expected2);
 
     REQUIRE_THROWS_AS(arr.Get(10), std::out_of_range);
     REQUIRE_THROWS_AS(arr.Set(5, 100), std::out_of_range);

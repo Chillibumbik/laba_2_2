@@ -166,3 +166,11 @@ const T& DynamicArray<T>::operator[](int index) const {
         throw Errors::IndexOutOfRange();
     return data[index];
 }
+
+template<typename T>
+bool operator==(const DynamicArray<T>& lhs, const DynamicArray<T>& rhs) {
+    if (lhs.GetSize() != rhs.GetSize()) return false;
+    for (int i = 0; i < lhs.GetSize(); ++i)
+        if (lhs.Get(i) != rhs.Get(i)) return false;
+    return true;
+}
