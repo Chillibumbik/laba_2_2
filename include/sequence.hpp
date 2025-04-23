@@ -33,3 +33,11 @@ Sequence<T>* operator+(const Sequence<T>& lhs, const Sequence<T>& rhs) {
 
     return lhs.Concat(&rhs);
 }
+
+template<typename T>
+bool operator==(const Sequence<T>& lhs, const Sequence<T>& rhs) {
+    if (lhs.GetLength() != rhs.GetLength()) return false;
+    for (int i = 0; i < lhs.GetLength(); ++i)
+        if (lhs.Get(i) != rhs.Get(i)) return false;
+    return true;
+}

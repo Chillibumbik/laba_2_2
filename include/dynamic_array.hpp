@@ -68,7 +68,6 @@ DynamicArray<T>::DynamicArray(const DynamicArray<T>& other) {
 
 template <class T>
 DynamicArray<T>::~DynamicArray() {
-    delete[] data;
 }
 
 template <class T>

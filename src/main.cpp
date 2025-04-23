@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <memory>
 #include <limits>
 #include "array_sequence.hpp"
 #include "list_sequence.hpp"
@@ -37,35 +36,37 @@ T GetTypedInput(const std::string& prompt = "Enter value: ") {
 
 struct ISequenceWrapper {
     virtual ~ISequenceWrapper() = default;
-    virtual void Show(/* int numName */) const = 0;
+    virtual void Show() const = 0;
     virtual void Append() = 0;
     virtual void Prepend() = 0;
     virtual void InsertAt() = 0;
     virtual void RemoveAt() = 0;
     virtual void GetAt() const = 0;
-    virtual void GetSubsequence() const = 0;
-    virtual std::shared_ptr<ISequenceWrapper> Concat(const std::shared_ptr<ISequenceWrapper>& other) const = 0;
+    virtual ISequenceWrapper* GetSubsequence() const = 0;
+    virtual ISequenceWrapper* Concat(const ISequenceWrapper* other) const = 0;
     virtual const std::string& TypeKey() const = 0;
 };
 
 template<typename T>
 struct SequenceWrapper : public ISequenceWrapper {
-    std::shared_ptr<Sequence<T>> seq;
+    Sequence<T>* seq;
     std::string structure;
     std::string type_key;
 
     SequenceWrapper(const std::string& structure_, const std::string& key) : structure(structure_), type_key(key) {
-        if (structure == "array") seq = std::make_shared<MutableArraySequence<T>>();
-        else seq = std::make_shared<MutableListSequence<T>>();
+        if (structure == "array") seq = new MutableArraySequence<T>();
+        else seq = new MutableListSequence<T>();
     }
 
-    void Show(/* int numName */) const override {
-        std::string name = (numName == 1) ? "array" : "list" 
+    ~SequenceWrapper() override {
+        delete seq;
+    }
+
+    void Show() const override {
         std::cout << "[ ";
         for (int i = 0; i < seq->GetLength(); ++i)
             std::cout << seq->Get(i) << " ";
-        std::cout << "]\n";
- /*        std::cout <<  << "\n"; */
+        std::cout << "] (Type: " << type_key << ", Structure: " << structure << ")\n";
     }
 
     void Append() override {
@@ -79,6 +80,7 @@ struct SequenceWrapper : public ISequenceWrapper {
     }
 
     void InsertAt() override {
+        std::cout << "Valid position: 0 to " << seq->GetLength() << "\n";
         int index = GetIntInput("Enter position: ");
         if (index < 0 || index > seq->GetLength()) throw Errors::IndexOutOfRange();
         T val = GetTypedInput<T>();
@@ -86,36 +88,38 @@ struct SequenceWrapper : public ISequenceWrapper {
     }
 
     void RemoveAt() override {
+        std::cout << "Valid index: 0 to " << seq->GetLength() - 1 << "\n";
         int index = GetIntInput("Enter index to remove: ");
         if (index < 0 || index >= seq->GetLength()) throw Errors::IndexOutOfRange();
         seq->Remove(index);
     }
 
     void GetAt() const override {
+        std::cout << "Valid index: 0 to " << seq->GetLength() - 1 << "\n";
         int index = GetIntInput("Enter index to get: ");
         if (index < 0 || index >= seq->GetLength()) throw Errors::IndexOutOfRange();
         std::cout << "Element: " << seq->Get(index) << "\n";
     }
 
-    void GetSubsequence() const override {
+    ISequenceWrapper* GetSubsequence() const override {
+        std::cout << "Valid range: 0 to " << seq->GetLength() - 1 << "\n";
         int start = GetIntInput("Enter start: ");
         int end = GetIntInput("Enter end: ");
         if (start < 0 || end >= seq->GetLength() || start > end) throw Errors::IndexOutOfRange();
-        auto sub = seq->GetSubsequence(start, end);
-        std::cout << "Subsequence: [ ";
-        for (int i = 0; i < sub->GetLength(); ++i)
-            std::cout << sub->Get(i) << " ";
-        std::cout << "]\n";
+        Sequence<T>* sub = seq->GetSubsequence(start, end);
+        auto* result = new SequenceWrapper<T>(structure, type_key);
+        delete result->seq;
+        result->seq = sub;
+        return result;
     }
 
-    std::shared_ptr<ISequenceWrapper> Concat(const std::shared_ptr<ISequenceWrapper>& other) const override {
-        auto other_casted = std::dynamic_pointer_cast<SequenceWrapper<T>>(other);
-        if (!other_casted || other_casted->structure != structure)
-            throw Errors::ConcatTypeMismatchError();
-
-        Sequence<T>* raw = *seq + *other_casted->seq;
-        auto result = std::make_shared<SequenceWrapper<T>>(structure, type_key);
-        result->seq = std::shared_ptr<Sequence<T>>(raw);
+    ISequenceWrapper* Concat(const ISequenceWrapper* other) const override {
+        auto other_casted = dynamic_cast<const SequenceWrapper<T>*>(other);
+        if (!other_casted) throw Errors::ConcatTypeMismatchError();
+        Sequence<T>* combined = *seq + *other_casted->seq;
+        auto* result = new SequenceWrapper<T>(structure, type_key);
+        delete result->seq;
+        result->seq = combined;
         return result;
     }
 
@@ -131,7 +135,7 @@ void ShowStructureMenu() {
     std::cout << "Select structure:\n1. array\n2. list\n";
 }
 
-int interface(std::vector<std::shared_ptr<ISequenceWrapper>> sequences) {
+int interface(std::vector<ISequenceWrapper*>& sequences) {
     while (true) {
         std::cout << "\n1. Show\n2. Append\n3. Prepend\n4. Remove element\n5. Insert element at index\n";
         std::cout << "6. Get element by index\n7. Get subsequence\n8. Concat sequences\n";
@@ -146,46 +150,47 @@ int interface(std::vector<std::shared_ptr<ISequenceWrapper>> sequences) {
             }
 
             switch (choice) {
-                case 1: // Show all sequences
+                case 1:
                     for (size_t i = 0; i < sequences.size(); ++i) {
                         std::cout << i << ": ";
                         sequences[i]->Show();
                     }
                     break;
 
-                case 2: case 3: case 4: case 5: case 6: case 7: { 
+                case 2: case 3: case 4: case 5: case 6: case 7: {
                     std::cout << "Choose sequence index (from 0 to " << sequences.size() - 1 << "): ";
                     int idx = GetIntInput();
                     if (idx < 0 || static_cast<size_t>(idx) >= sequences.size()) throw Errors::IndexOutOfRange();
                     switch (choice) {
-                        case 2: sequences[idx]->Append(); break; // Append
-                        case 3: sequences[idx]->Prepend(); break; // Prepend
-                        case 4: sequences[idx]->RemoveAt(); break; // Remove
-                        case 5: sequences[idx]->InsertAt(); break; // Insert
-                        case 6: sequences[idx]->GetAt(); break; // Get
+                        case 2: sequences[idx]->Append(); break;
+                        case 3: sequences[idx]->Prepend(); break;
+                        case 4: sequences[idx]->RemoveAt(); break;
+                        case 5: sequences[idx]->InsertAt(); break;
+                        case 6: sequences[idx]->GetAt(); break;
                         case 7: {
-                            /* auto result =  */sequences[idx]->GetSubsequence(); break;  // Get subsequence
-/*                             sequences.push_back(result);
-                            std::cout << "Concatenated sequence added as index " << sequences.size() - 1 << "\n";  */  // Переделай getsupsequence
+                            ISequenceWrapper* result = sequences[idx]->GetSubsequence();
+                            sequences.push_back(result);
+                            std::cout << "Subsequence added as index " << sequences.size() - 1 << "\n";
+                            break;
                         }
                     }
                     break;
                 }
 
-                case 8: {  // Concat sequences
+                case 8: {
                     std::cout << "First sequence index (0 to " << sequences.size() - 1 << "): ";
                     int i1 = GetIntInput();
                     std::cout << "Second sequence index (0 to " << sequences.size() - 1 << "): ";
                     int i2 = GetIntInput();
                     if (i1 < 0 || i2 < 0 || static_cast<size_t>(i1) >= sequences.size() || static_cast<size_t>(i2) >= sequences.size())
                         throw Errors::IndexOutOfRange();
-                    auto result = sequences[i1]->Concat(sequences[i2]);
+                    ISequenceWrapper* result = sequences[i1]->Concat(sequences[i2]);
                     sequences.push_back(result);
                     std::cout << "Concatenated sequence added as index " << sequences.size() - 1 << "\n";
                     break;
                 }
 
-                case 9: {  // Add new sequence
+                case 9: {
                     ShowTypeMenu();
                     int t = GetIntInput("Enter type: ");
                     std::string type;
@@ -201,10 +206,10 @@ int interface(std::vector<std::shared_ptr<ISequenceWrapper>> sequences) {
                     int s = GetIntInput("Enter structure: ");
                     std::string structure = (s == 1) ? "array" : (s == 2) ? "list" : throw Errors::InvalidArgument();
 
-                    if (type == "int") sequences.push_back(std::make_shared<SequenceWrapper<int>>(structure, type));
-                    else if (type == "double") sequences.push_back(std::make_shared<SequenceWrapper<double>>(structure, type));
-                    else if (type == "string") sequences.push_back(std::make_shared<SequenceWrapper<std::string>>(structure, type));
-                    else if (type == "user") sequences.push_back(std::make_shared<SequenceWrapper<User>>(structure, type));
+                    if (type == "int") sequences.push_back(new SequenceWrapper<int>(structure, type));
+                    else if (type == "double") sequences.push_back(new SequenceWrapper<double>(structure, type));
+                    else if (type == "string") sequences.push_back(new SequenceWrapper<std::string>(structure, type));
+                    else if (type == "user") sequences.push_back(new SequenceWrapper<User>(structure, type));
                     break;
                 }
 
@@ -212,12 +217,14 @@ int interface(std::vector<std::shared_ptr<ISequenceWrapper>> sequences) {
                     std::cout << "Index to remove (0 to " << sequences.size() - 1 << "): ";
                     int idx = GetIntInput();
                     if (idx < 0 || static_cast<size_t>(idx) >= sequences.size()) throw Errors::IndexOutOfRange();
+                    delete sequences[idx];
                     sequences.erase(sequences.begin() + idx);
                     break;
                 }
 
                 case 11:
                     std::cout << "Exiting...\n";
+                    for (auto* ptr : sequences) delete ptr;
                     return 0;
 
                 default:
@@ -231,7 +238,7 @@ int interface(std::vector<std::shared_ptr<ISequenceWrapper>> sequences) {
 }
 
 int main() {
-    std::vector<std::shared_ptr<ISequenceWrapper>> sequences;
+    std::vector<ISequenceWrapper*> sequences;
     interface(sequences);
 }
 
@@ -251,13 +258,13 @@ int main() {
 //когда у меня спрашивают индекс - пусть скажут, в каких пределах он может изменяться ---ВЫПОЛНЕНО---
 //подпоследовательность и сконкатинированна пос-ть сохраняются в новую пос-ть ---ВЫПОЛНЕНО---
 
-//shared / unique указатели до слнд еместра не использовать
+//shared / unique указатели до слнд еместра не использовать ---ВЫПОЛНЕНО
 //тесты: сравнивать массивы и списки целиком, а не посимвольно (с ожидаемым массивом)
-//перегрузка для сравнения (==) 
+//перегрузка для сравнения (==)  ---ВЫПОЛНЕНО--- 
 //ошибки макс скинет
-//show также выводит тип пос-ти
-//не везде подсказывает доступные индексы (например, subsequence)
-//subsequence - не добавляет в пос-ти результат
+//show также выводит тип пос-ти ---ВЫПОЛНЕНО---
+//не везде подсказывает доступные индексы (например, subsequence) ---ВЫПОЛНЕНО---
+//subsequence - не добавляет в пос-ти результат ---ВЫПОЛНЕНО---
 //concat должен позволять добавлять к array list и наоборот. тип результата == типу первой пос-и
 
 
