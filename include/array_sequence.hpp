@@ -166,6 +166,11 @@ MutableArraySequence<T> operator+(const MutableArraySequence<T>& lhs, const Muta
     return copy;
 }
 
+template <typename T>
+MutableArraySequence<T> operator==(const MutableArraySequence<T>& first, const MutableArraySequence<T>& second) { // надо еще сделать сравнение последовательности со статичным массивом
+    
+}
+
 // Неизменяемая версия
 template <typename T>
 class ImmutableArraySequence : public MutableArraySequence<T> {
@@ -243,3 +248,4 @@ ImmutableArraySequence<T> operator+(const ImmutableArraySequence<T>& lhs, const 
     delete result;
     return copy;
 }
+

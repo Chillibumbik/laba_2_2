@@ -37,7 +37,7 @@ T GetTypedInput(const std::string& prompt = "Enter value: ") {
 
 struct ISequenceWrapper {
     virtual ~ISequenceWrapper() = default;
-    virtual void Show() const = 0;
+    virtual void Show(/* int numName */) const = 0;
     virtual void Append() = 0;
     virtual void Prepend() = 0;
     virtual void InsertAt() = 0;
@@ -59,11 +59,13 @@ struct SequenceWrapper : public ISequenceWrapper {
         else seq = std::make_shared<MutableListSequence<T>>();
     }
 
-    void Show() const override {
+    void Show(/* int numName */) const override {
+        std::string name = (numName == 1) ? "array" : "list" 
         std::cout << "[ ";
         for (int i = 0; i < seq->GetLength(); ++i)
             std::cout << seq->Get(i) << " ";
         std::cout << "]\n";
+ /*        std::cout <<  << "\n"; */
     }
 
     void Append() override {
@@ -161,7 +163,11 @@ int interface(std::vector<std::shared_ptr<ISequenceWrapper>> sequences) {
                         case 4: sequences[idx]->RemoveAt(); break; // Remove
                         case 5: sequences[idx]->InsertAt(); break; // Insert
                         case 6: sequences[idx]->GetAt(); break; // Get
-                        case 7: sequences[idx]->GetSubsequence(); break;  // Get subsequence
+                        case 7: {
+                            /* auto result =  */sequences[idx]->GetSubsequence(); break;  // Get subsequence
+/*                             sequences.push_back(result);
+                            std::cout << "Concatenated sequence added as index " << sequences.size() - 1 << "\n";  */  // Переделай getsupsequence
+                        }
                     }
                     break;
                 }
@@ -244,4 +250,14 @@ int main() {
 //добавить пользовательский тип - какую-нибудь структуру (например, user) ---ВЫПОЛНЕНО---
 //когда у меня спрашивают индекс - пусть скажут, в каких пределах он может изменяться ---ВЫПОЛНЕНО---
 //подпоследовательность и сконкатинированна пос-ть сохраняются в новую пос-ть ---ВЫПОЛНЕНО---
+
+//shared / unique указатели до слнд еместра не использовать
+//тесты: сравнивать массивы и списки целиком, а не посимвольно (с ожидаемым массивом)
+//перегрузка для сравнения (==) 
+//ошибки макс скинет
+//show также выводит тип пос-ти
+//не везде подсказывает доступные индексы (например, subsequence)
+//subsequence - не добавляет в пос-ти результат
+//concat должен позволять добавлять к array list и наоборот. тип результата == типу первой пос-и
+
 
