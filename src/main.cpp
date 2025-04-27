@@ -116,12 +116,27 @@ struct SequenceWrapper : public ISequenceWrapper {
     ISequenceWrapper* Concat(const ISequenceWrapper* other) const override {
         auto other_casted = dynamic_cast<const SequenceWrapper<T>*>(other);
         if (!other_casted) throw Errors::ConcatTypeMismatchError();
-        Sequence<T>* combined = *seq + *other_casted->seq;
+    
+        Sequence<T>* new_seq;
+        if (structure == "array") {
+            new_seq = new MutableArraySequence<T>();
+        } else if (structure == "list") {
+            new_seq = new MutableListSequence<T>();
+        } else {
+            throw Errors::InvalidArgument();
+        }
+    
+        for (int i = 0; i < seq->GetLength(); ++i)
+            new_seq->Append(seq->Get(i));
+        for (int i = 0; i < other_casted->seq->GetLength(); ++i)
+            new_seq->Append(other_casted->seq->Get(i));
+    
         auto* result = new SequenceWrapper<T>(structure, type_key);
         delete result->seq;
-        result->seq = combined;
+        result->seq = new_seq;
         return result;
     }
+    
 
     const std::string& TypeKey() const override {
         return type_key;
@@ -261,9 +276,9 @@ int main() {
 //shared / unique указатели до слнд еместра не использовать ---ВЫПОЛНЕНО
 //тесты: сравнивать массивы и списки целиком, а не посимвольно (с ожидаемым массивом) ---ВЫПОЛНЕНО---
 //перегрузка для сравнения (==)  ---ВЫПОЛНЕНО--- 
-//ошибки макс скинет
+//ошибки макс скинет ---ВЫПОЛЕНО---
 //show также выводит тип пос-ти ---ВЫПОЛНЕНО---
 //не везде подсказывает доступные индексы (например, subsequence) ---ВЫПОЛНЕНО---
 //subsequence - не добавляет в пос-ти результат ---ВЫПОЛНЕНО---
-//concat должен позволять добавлять к array list и наоборот. тип результата == типу первой пос-и
+    //concat должен позволять добавлять к array list и наоборот. тип результата == типу первой пос-и ---
 
